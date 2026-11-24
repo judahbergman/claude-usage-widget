@@ -15,7 +15,7 @@ $exe  = Join-Path $dir 'ClaudeUsage.exe'
 $tmp  = Join-Path $dir 'ClaudeUsage.download'
 
 Write-Host ''
-Write-Host '==> Downloading the latest Claude Usage (about 60 MB)...'
+Write-Host '==> Downloading the latest Claude Usage (about 70 MB)...'
 New-Item -ItemType Directory -Force -Path $dir | Out-Null
 Invoke-WebRequest -UseBasicParsing -Uri "https://github.com/$repo/releases/latest/download/ClaudeUsage-Windows.exe" -OutFile $tmp
 if ((Get-Item $tmp).Length -lt 1MB) {
