@@ -17,6 +17,7 @@ It shows the same numbers as claude.ai → Settings → Usage, and updates every
    ```
 
 3. A **Sign in to Claude** window opens. Sign in with your own Claude account. You only need to do this once.
+   - **Signing in by email?** Don't click the link in the email, because that opens it in your web browser. Instead, right-click the sign-in button in the email, choose **Copy Link**, and click **Paste Link** at the top of the sign-in window.
 
 The widget then appears in the top-right corner of your screen. It starts on its own when you log in, and it **updates itself automatically**, so you never need to reinstall it.
 

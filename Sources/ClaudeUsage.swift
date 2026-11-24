@@ -639,18 +639,42 @@ final class SignInWindow: NSObject, WKNavigationDelegate, WKUIDelegate, NSWindow
         finished = false
         let config = WKWebViewConfiguration()
         config.websiteDataStore = WKWebsiteDataStore.default()
-        let frame = NSRect(x: 0, y: 0, width: 480, height: 700)
-        let wv = WKWebView(frame: frame, configuration: config)
+        let frame = NSRect(x: 0, y: 0, width: 480, height: 744)
+        let barHeight: CGFloat = 44
+        let wv = WKWebView(frame: NSRect(x: 0, y: 0, width: frame.width, height: frame.height - barHeight),
+                           configuration: config)
         wv.customUserAgent = SignInWindow.safariUA
         wv.navigationDelegate = self
         wv.uiDelegate = self
+        wv.autoresizingMask = [.width, .height]
+
+        // A bar on top for signing in by email: paste the link from the email here,
+        // so it opens inside this window instead of in Chrome.
+        let bar = NSView(frame: NSRect(x: 0, y: frame.height - barHeight, width: frame.width, height: barHeight))
+        bar.autoresizingMask = [.width, .minYMargin]
+        let label = NSTextField(labelWithString: "Signing in by email? Copy the link in the email, then:")
+        label.font = NSFont.systemFont(ofSize: 11)
+        label.textColor = NSColor.secondaryLabelColor
+        label.frame = NSRect(x: 12, y: 13, width: frame.width - 130, height: 18)
+        label.autoresizingMask = [.width]
+        label.lineBreakMode = .byTruncatingTail
+        let button = NSButton(title: "Paste Link", target: self, action: #selector(pasteLink))
+        button.bezelStyle = .rounded
+        button.frame = NSRect(x: frame.width - 112, y: 8, width: 100, height: 28)
+        button.autoresizingMask = [.minXMargin]
+        bar.addSubview(label)
+        bar.addSubview(button)
+
+        let container = NSView(frame: frame)
+        container.addSubview(wv)
+        container.addSubview(bar)
 
         let w = NSWindow(contentRect: frame,
                          styleMask: [.titled, .closable, .miniaturizable, .resizable],
                          backing: .buffered, defer: false)
         w.title = "Sign in to Claude"
         w.isReleasedWhenClosed = false
-        w.contentView = wv
+        w.contentView = container
         w.delegate = self
         w.center()
         window = w
@@ -667,6 +691,28 @@ final class SignInWindow: NSObject, WKNavigationDelegate, WKUIDelegate, NSWindow
 
         timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] _ in
             Task { @MainActor in await self?.checkSignedIn() }
+        }
+    }
+
+    /// Opens the sign-in link from the email (copied to the clipboard) inside this window.
+    @objc func pasteLink() {
+        guard let wv = webView else { return }
+        let text = (NSPasteboard.general.string(forType: .string) ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let allowed = ["claude.ai", "claude.com", "anthropic.com"]
+        if let url = URL(string: text), url.scheme == "https", let host = url.host?.lowercased(),
+           allowed.contains(where: { host == $0 || host.hasSuffix("." + $0) }) {
+            wv.load(URLRequest(url: url))
+            return
+        }
+        let alert = NSAlert()
+        alert.messageText = "Copy the sign-in link first"
+        alert.informativeText = "In the sign-in email from Claude, right-click the sign-in button (or link) and choose Copy Link. Then come back here and click Paste Link. Don't click the link itself, because that opens it in your web browser instead."
+        alert.addButton(withTitle: "OK")
+        if let w = window {
+            alert.beginSheetModal(for: w, completionHandler: nil)
+        } else {
+            alert.runModal()
         }
     }
 
