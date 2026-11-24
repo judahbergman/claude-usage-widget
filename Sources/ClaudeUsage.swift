@@ -557,14 +557,9 @@ final class UsageStore: ObservableObject {
         // Nothing worked: ask the user to sign in.
         needsSignIn = true
         orgName = nil
-        let why: String
-        if !tried.isEmpty {
-            why = "Your claude.ai login expired."
-        } else {
-            why = chromeProblem ?? "The widget isn't signed in to claude.ai."
-        }
+        _ = chromeProblem
         setProblem("Click to sign in",
-                   why + " Click the widget and choose Sign In to Claude…")
+                   tried.isEmpty ? "Not signed in to claude.ai" : "Your claude.ai sign-in expired")
         if !askedForSignIn {
             askedForSignIn = true
             onNeedsSignIn?()
@@ -581,13 +576,14 @@ final class UsageStore: ObservableObject {
         } catch APIError.unauthorized {
             return .unauthorized
         } catch APIError.network(let message) {
-            setProblem("Offline", "Couldn't reach claude.ai (\(message)). Retrying automatically.")
+            _ = message
+            setProblem("Offline", "Can't reach claude.ai right now")
             return .stop
         } catch APIError.blocked {
-            setProblem("Busy", "claude.ai turned the request away. Retrying automatically.")
+            setProblem("Busy", "claude.ai is busy, trying again soon")
             return .stop
         } catch {
-            setProblem("Error", "Couldn't read usage from claude.ai. Retrying automatically.")
+            setProblem("Error", "Couldn't read usage, trying again soon")
             return .stop
         }
     }
@@ -1202,25 +1198,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
 
+        var statusLine: String? = store.detail
+        if statusLine == nil, let t = store.lastUpdated {
+            let time = DateFormatter.localizedString(from: t, dateStyle: .none, timeStyle: .short)
+            statusLine = "Updated \(time)"
+        }
+        if let line = statusLine {
+            let info = NSMenuItem(title: line, action: nil, keyEquivalent: "")
+            info.isEnabled = false
+            menu.addItem(info)
+        }
         if store.needsSignIn {
             add(menu, "Sign In to Claude…", #selector(showSignIn))
-            menu.addItem(.separator())
         }
         if let v = store.updateAvailable, !store.updating {
             add(menu, "Update to Version \(v) Now", #selector(installUpdateNow))
-            menu.addItem(.separator())
         }
-
-        if let d = store.detail {
-            let info = NSMenuItem(title: d, action: nil, keyEquivalent: "")
-            info.isEnabled = false
-            menu.addItem(info)
-            menu.addItem(.separator())
-        } else if let t = store.lastUpdated {
-            let time = DateFormatter.localizedString(from: t, dateStyle: .none, timeStyle: .short)
-            let info = NSMenuItem(title: "Updated \(time)", action: nil, keyEquivalent: "")
-            info.isEnabled = false
-            menu.addItem(info)
+        if menu.items.count > 0 {
             menu.addItem(.separator())
         }
 
@@ -1246,7 +1240,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
 
         menu.addItem(.separator())
-        add(menu, "Sign In to Claude…", #selector(showSignIn))
+        if !store.needsSignIn {
+            add(menu, "Sign In with Another Account…", #selector(showSignIn))
+        }
         add(menu, "Paste Session Key Manually…", #selector(enterKey))
         menu.addItem(.separator())
         add(menu, "Check for Updates…", #selector(checkForUpdatesNow))

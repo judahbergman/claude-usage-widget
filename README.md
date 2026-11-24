@@ -39,7 +39,7 @@ curl -fsSL https://raw.githubusercontent.com/JoolBaby/claude-usage-widget/main/i
 
 - The widget talks only to **claude.ai** (to read your usage) and to **GitHub** (to check for new versions).
 - Your Claude login is stored only on your own Mac, inside the widget's built-in sign-in window storage. Nothing is sent anywhere else.
-- As a backup, it can borrow your claude.ai login from Google Chrome on your Mac. macOS asks your permission before it can, and you can click **Deny**.
+- As a backup, it can try to borrow your claude.ai login from Google Chrome on your Mac. macOS asks your permission first, and you can click **Deny**. Newer versions of macOS may block this entirely; the widget's own sign-in works either way.
 - This project contains only the widget's code. There are no passwords, keys or account data in it.
 
 ## For maintainers: publishing an update
