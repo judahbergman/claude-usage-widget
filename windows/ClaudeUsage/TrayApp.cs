@@ -14,6 +14,7 @@ internal sealed class TrayApp : ApplicationContext
     private readonly ContextMenuStrip _menu = new();
     private readonly UsagePopup _popup;
     private readonly Control _ui = new();   // used to run work on the UI thread
+    private readonly WebFetcher _web = new();
     private readonly List<System.Windows.Forms.Timer> _timers = new();
     private SignInForm? _signIn;
     private Icon? _icon;
@@ -67,6 +68,21 @@ internal sealed class TrayApp : ApplicationContext
         {
             // Exercise the panel and the menu, so the GitHub check catches drawing errors.
             Once(3_000, () => { ShowPanel(); BuildMenu(); });
+            Once(4_000, async () =>
+            {
+                string line;
+                try
+                {
+                    (int status, string body) = await _web.FetchAsync("/api/organizations");
+                    line = $"hidden browser fetch: HTTP {status}, {body.Length} bytes";
+                }
+                catch (FetchException e)
+                {
+                    line = $"hidden browser fetch: {e.Kind} ({e.Message})";
+                }
+                Directory.CreateDirectory(Settings.Folder);
+                File.AppendAllText(Path.Combine(Settings.Folder, "selftest.log"), line + Environment.NewLine);
+            });
         }
     }
 
@@ -118,16 +134,20 @@ internal sealed class TrayApp : ApplicationContext
         _loading = true;
         try
         {
-            string? key = SessionStore.Load();
-            if (key == null)
-            {
-                NeedSignIn("Not signed in to claude.ai");
-                return;
-            }
             try
             {
-                UsageResult r = await UsageClient.FetchAsync(key, _settings.OrgId);
-                if (r.RenewedKey != null) SessionStore.Save(r.RenewedKey);
+                bool signedIn = await _web.HasSessionAsync();
+                if (!signedIn && SessionStore.Load() is string saved)
+                {
+                    await _web.RestoreSessionAsync(saved);
+                    signedIn = true;
+                }
+                if (!signedIn)
+                {
+                    NeedSignIn("Not signed in to claude.ai");
+                    return;
+                }
+                UsageResult r = await UsageClient.FetchAsync(_web, _settings.OrgId);
                 _state.Orgs = r.Orgs;
                 _state.CurrentOrgId = r.Org.Id;
                 _state.OrgName = r.Orgs.Count > 1 ? r.Org.Name : null;
@@ -145,6 +165,7 @@ internal sealed class TrayApp : ApplicationContext
                     case FetchError.Unauthorized: NeedSignIn("Your claude.ai sign-in expired"); break;
                     case FetchError.Network: Problem("Offline", "Can't reach claude.ai right now"); break;
                     case FetchError.Blocked: Problem("Busy", "claude.ai is busy, trying again soon"); break;
+                    case FetchError.NoBrowser: Problem("Needs WebView2", "Needs Microsoft Edge WebView2 (free from Microsoft)"); break;
                     default: Problem("Error", "Couldn't read usage, trying again soon"); break;
                 }
             }
@@ -378,6 +399,7 @@ internal sealed class TrayApp : ApplicationContext
         _tray.Visible = false;
         _tray.Dispose();
         _icon?.Dispose();
+        _web.Dispose();
         base.ExitThreadCore();
     }
 }

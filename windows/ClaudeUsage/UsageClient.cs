@@ -1,6 +1,4 @@
 using System.Globalization;
-using System.Net;
-using System.Net.Http.Headers;
 using System.Text.Json;
 
 namespace ClaudeUsage;
@@ -9,7 +7,7 @@ internal sealed record Bucket(double Utilization, DateTimeOffset? ResetsAt);
 
 internal sealed record Org(string Id, string Name, int Score);
 
-internal enum FetchError { Unauthorized, Blocked, Network, BadData }
+internal enum FetchError { Unauthorized, Blocked, Network, BadData, NoBrowser }
 
 internal sealed class FetchException : Exception
 {
@@ -27,78 +25,32 @@ internal sealed class UsageResult
     public required Org Org { get; init; }
     public Bucket? Session { get; init; }
     public Bucket? Weekly { get; init; }
-    public string? RenewedKey { get; init; }
 }
 
 /// <summary>Reads your usage from claude.ai, the same numbers as Settings → Usage.</summary>
 internal static class UsageClient
 {
-    private static readonly HttpClient Http = new(new HttpClientHandler
+    private static async Task<JsonDocument> GetJsonAsync(WebFetcher web, string path)
     {
-        UseCookies = false,
-        AutomaticDecompression = DecompressionMethods.All,
-    })
-    {
-        Timeout = TimeSpan.FromSeconds(20),
-    };
-
-    private const string UserAgent =
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0";
-
-    private static async Task<(JsonDocument Doc, string? Renewed)> GetAsync(string path, string key)
-    {
-        using var req = new HttpRequestMessage(HttpMethod.Get, "https://claude.ai" + path);
-        req.Headers.TryAddWithoutValidation("Cookie", "sessionKey=" + key);
-        req.Headers.TryAddWithoutValidation("User-Agent", UserAgent);
-        req.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-        HttpResponseMessage resp;
+        (int status, string body) = await web.FetchAsync(path);
+        bool html = body.TrimStart().StartsWith("<");
+        if (status < 0) throw new FetchException(FetchError.Network, body);
+        if (status == 429 || ((status == 403 || status == 503) && html)) throw new FetchException(FetchError.Blocked);
+        if (status == 401 || status == 403) throw new FetchException(FetchError.Unauthorized);
+        if (status != 200) throw new FetchException(FetchError.BadData, $"HTTP {status}");
         try
         {
-            resp = await Http.SendAsync(req).ConfigureAwait(true);
+            return JsonDocument.Parse(body);
         }
-        catch (Exception e)
+        catch
         {
-            throw new FetchException(FetchError.Network, e.Message);
-        }
-
-        using (resp)
-        {
-            int code = (int)resp.StatusCode;
-            string type = resp.Content.Headers.ContentType?.MediaType ?? "";
-            if (code == 429 || ((code == 403 || code == 503) && type.Contains("html")))
-                throw new FetchException(FetchError.Blocked);
-            if (code == 401 || code == 403)
-                throw new FetchException(FetchError.Unauthorized);
-            if (code != 200)
-                throw new FetchException(FetchError.BadData);
-
-            string? renewed = null;
-            if (resp.Headers.TryGetValues("Set-Cookie", out var cookies))
-            {
-                foreach (string c in cookies)
-                {
-                    if (!c.StartsWith("sessionKey=", StringComparison.Ordinal)) continue;
-                    string value = c.Substring("sessionKey=".Length).Split(';')[0].Trim();
-                    if (value.Length > 0 && value != key) renewed = value;
-                }
-            }
-
-            string text = await resp.Content.ReadAsStringAsync().ConfigureAwait(true);
-            try
-            {
-                return (JsonDocument.Parse(text), renewed);
-            }
-            catch
-            {
-                throw new FetchException(FetchError.BadData);
-            }
+            throw new FetchException(FetchError.BadData);
         }
     }
 
-    public static async Task<UsageResult> FetchAsync(string key, string? preferredOrgId)
+    public static async Task<UsageResult> FetchAsync(WebFetcher web, string? preferredOrgId)
     {
-        var (orgDoc, renewed1) = await GetAsync("/api/organizations", key).ConfigureAwait(true);
+        JsonDocument orgDoc = await GetJsonAsync(web, "/api/organizations");
         List<Org> orgs = new();
         using (orgDoc)
         {
@@ -125,7 +77,7 @@ internal static class UsageClient
         if (orgs.Count == 0) throw new FetchException(FetchError.BadData);
         Org org = orgs.FirstOrDefault(x => x.Id == preferredOrgId) ?? orgs.OrderByDescending(x => x.Score).First();
 
-        var (usageDoc, renewed2) = await GetAsync($"/api/organizations/{org.Id}/usage", key).ConfigureAwait(true);
+        JsonDocument usageDoc = await GetJsonAsync(web, $"/api/organizations/{org.Id}/usage");
         using (usageDoc)
         {
             JsonElement root = usageDoc.RootElement;
@@ -135,7 +87,6 @@ internal static class UsageClient
                 Org = org,
                 Session = ParseBucket(root, "five_hour"),
                 Weekly = ParseBucket(root, "seven_day"),
-                RenewedKey = renewed2 ?? renewed1,
             };
         }
     }

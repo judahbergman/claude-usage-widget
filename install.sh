@@ -85,6 +85,30 @@ cat > "$AGENT" <<AGENT_EOF
 </plist>
 AGENT_EOF
 
+# First install only: explain the sign-in step before the sign-in window opens.
+if [ ! -d "$HOME/Library/WebKit/$BUNDLE_ID" ]; then
+  echo ""
+  echo "=================================================================="
+  echo "  NEXT: SIGN IN (please read before continuing)"
+  echo ""
+  echo "  A \"Sign in to Claude\" window will open. Sign in with your own"
+  echo "  Claude account (the one you use for work)."
+  echo ""
+  echo "  If you sign in with your EMAIL:"
+  echo "    1. Type your email and continue."
+  echo "    2. Open the email from Claude. DON'T click the link in it."
+  echo "    3. Right-click the link and choose \"Copy Link\"."
+  echo "    4. In the sign-in window, click \"Paste Link\" at the top."
+  echo ""
+  echo "  The window closes by itself when you're signed in."
+  echo "=================================================================="
+  echo ""
+  if [ -r /dev/tty ]; then
+    printf "Press Return to open the sign-in window... "
+    read -r _ < /dev/tty || true
+  fi
+fi
+
 echo "==> Starting Claude Usage"
 if ! launchctl bootstrap "gui/$(id -u)" "$AGENT" 2>/dev/null; then
   open "$APP"
@@ -92,6 +116,6 @@ fi
 
 echo ""
 echo "Done! Claude Usage is on your desktop."
-echo "  • A \"Sign in to Claude\" window opens the first time. Sign in once and it stays signed in."
+echo "  • Sign in once in the \"Sign in to Claude\" window and it stays signed in."
 echo "  • Click (or right-click) the widget for its menu. Drag it to move it; it remembers the spot."
 echo "  • It updates itself automatically from now on."

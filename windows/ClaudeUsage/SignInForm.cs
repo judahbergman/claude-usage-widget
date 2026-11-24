@@ -27,16 +27,30 @@ internal sealed class SignInForm : Form
 
         // Bar on top for signing in by email: paste the link from the email here, so it
         // opens inside this window instead of in your web browser.
-        var bar = new Panel { Dock = DockStyle.Top, Height = 46, Padding = new Padding(12, 9, 12, 9) };
+        var bar = new Panel
+        {
+            Dock = DockStyle.Top,
+            Height = 76,
+            Padding = new Padding(14, 10, 14, 10),
+            BackColor = Color.FromArgb(255, 244, 206),
+        };
         var label = new Label
         {
-            Text = "Signing in by email? Copy the link in the email, then:",
+            Text = "Signing in with email?  Don't click the link in the email.\n" +
+                   "Right-click it, choose \"Copy link\", then click Paste Link.",
             Dock = DockStyle.Fill,
             TextAlign = ContentAlignment.MiddleLeft,
-            ForeColor = SystemColors.GrayText,
-            AutoEllipsis = true,
+            ForeColor = Color.FromArgb(60, 45, 10),
+            Font = new Font("Segoe UI Semibold", 9.75f),
         };
-        var paste = new Button { Text = "Paste Link", Dock = DockStyle.Right, Width = 104 };
+        var paste = new Button
+        {
+            Text = "Paste Link",
+            Dock = DockStyle.Right,
+            Width = 110,
+            BackColor = Color.White,
+            Font = new Font("Segoe UI Semibold", 9.75f),
+        };
         paste.Click += (_, _) => PasteLink();
         bar.Controls.Add(label);   // docked last: fills what's left
         bar.Controls.Add(paste);   // docked first: right edge
@@ -54,11 +68,12 @@ internal sealed class SignInForm : Form
     {
         try
         {
-            var env = await CoreWebView2Environment.CreateAsync(null, Path.Combine(Settings.Folder, "WebView2"));
+            CoreWebView2Environment env = await WebFetcher.SharedEnvironment();
             await _web.EnsureCoreWebView2Async(env);
         }
         catch (Exception)
         {
+            WebFetcher.ResetEnvironment();
             MessageBox.Show(this,
                 "Signing in needs Microsoft Edge WebView2, a free part of Windows that's missing on this PC.\n\n" +
                 "Click OK to open Microsoft's download page. Install it, then choose Sign In to Claude again.",

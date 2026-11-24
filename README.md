@@ -34,7 +34,7 @@ You'll see a few lines appear as it downloads and installs. It ends with **"Done
 > If it asks for your **password**: type your Mac login password and press Return. **The password won't appear as you type.** That's normal on Mac.
 
 **3. Sign in.**
-A **Sign in to Claude** window opens. See [Signing in](#signing-in) below.
+The installer pauses and shows you how to sign in. Read it, press **Return**, and a **Sign in to Claude** window opens. See [Signing in](#signing-in) below.
 
 **4. Done.** The widget appears in the top-right corner of your screen. You can close Terminal.
 
@@ -60,7 +60,7 @@ irm https://raw.githubusercontent.com/JoolBaby/claude-usage-widget/main/install.
 It downloads the app (about 70 MB) and ends with **"Done! Claude Usage is running."**
 
 **3. Sign in.**
-A **Sign in to Claude** window opens. See [Signing in](#signing-in) below.
+The installer pauses and shows you how to sign in. Read it, press **Enter**, and a **Sign in to Claude** window opens. See [Signing in](#signing-in) below.
 
 **4. Find it in the taskbar.**
 Your usage appears as a small **colored number** in the taskbar, by the clock. The number is your session usage in percent.
@@ -86,7 +86,7 @@ The first time, a **Sign in to Claude** window opens. Sign in with **your own** 
 1. Type your email and click **Continue with email**.
 2. Open the email from Claude. **Don't click the link in it.** Clicking opens it in your web browser instead of the app, and the sign-in won't work.
 3. Instead, **right-click** the sign-in button (or link) in the email and choose **Copy Link** (Mac) or **Copy link** (Windows).
-4. Go back to the **Sign in to Claude** window and click **Paste Link** at the top.
+4. Go back to the **Sign in to Claude** window and click **Paste Link** in the yellow bar at the top.
 
 The window closes on its own when you're signed in, and your usage appears.
 

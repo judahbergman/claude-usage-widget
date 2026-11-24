@@ -40,12 +40,33 @@ $shortcut.TargetPath = $exe
 $shortcut.Description = 'Claude Usage'
 $shortcut.Save()
 
+# First install only: explain the sign-in step before the sign-in window opens.
+if (-not (Test-Path (Join-Path $env:LOCALAPPDATA 'ClaudeUsage\session.dat'))) {
+    Write-Host ''
+    Write-Host '==================================================================' -ForegroundColor Yellow
+    Write-Host '  NEXT: SIGN IN (please read before continuing)' -ForegroundColor Yellow
+    Write-Host ''
+    Write-Host '  A "Sign in to Claude" window will open. Sign in with your own'
+    Write-Host '  Claude account (the one you use for work).'
+    Write-Host ''
+    Write-Host '  If you sign in with your EMAIL:' -ForegroundColor Yellow
+    Write-Host '    1. Type your email and continue.'
+    Write-Host "    2. Open the email from Claude. DON'T click the link in it."
+    Write-Host '    3. Right-click the link and choose "Copy link".'
+    Write-Host '    4. In the sign-in window, click "Paste Link" at the top.'
+    Write-Host ''
+    Write-Host "  The window closes by itself when you're signed in."
+    Write-Host '==================================================================' -ForegroundColor Yellow
+    Write-Host ''
+    try { Read-Host 'Press Enter to open the sign-in window' | Out-Null } catch { }
+}
+
 Write-Host '==> Starting Claude Usage'
 Start-Process $exe
 
 Write-Host ''
 Write-Host 'Done! Claude Usage is running.' -ForegroundColor Green
-Write-Host '  * A "Sign in to Claude" window opens. Sign in once and it stays signed in.'
+Write-Host '  * Sign in once in the "Sign in to Claude" window and it stays signed in.'
 Write-Host '  * Your usage appears as a small colored number in the taskbar, next to the clock.'
 Write-Host '    If you do not see it, click the small up-arrow (^) next to the clock.'
 Write-Host '  * Click the number for details. Right-click it for options.'

@@ -635,8 +635,8 @@ final class SignInWindow: NSObject, WKNavigationDelegate, WKUIDelegate, NSWindow
         finished = false
         let config = WKWebViewConfiguration()
         config.websiteDataStore = WKWebsiteDataStore.default()
-        let frame = NSRect(x: 0, y: 0, width: 480, height: 744)
-        let barHeight: CGFloat = 44
+        let frame = NSRect(x: 0, y: 0, width: 480, height: 776)
+        let barHeight: CGFloat = 76
         let wv = WKWebView(frame: NSRect(x: 0, y: 0, width: frame.width, height: frame.height - barHeight),
                            configuration: config)
         wv.customUserAgent = SignInWindow.safariUA
@@ -644,19 +644,22 @@ final class SignInWindow: NSObject, WKNavigationDelegate, WKUIDelegate, NSWindow
         wv.uiDelegate = self
         wv.autoresizingMask = [.width, .height]
 
-        // A bar on top for signing in by email: paste the link from the email here,
-        // so it opens inside this window instead of in Chrome.
+        // A highlighted bar on top for signing in by email: paste the link from the email
+        // here, so it opens inside this window instead of in the web browser.
         let bar = NSView(frame: NSRect(x: 0, y: frame.height - barHeight, width: frame.width, height: barHeight))
         bar.autoresizingMask = [.width, .minYMargin]
-        let label = NSTextField(labelWithString: "Signing in by email? Copy the link in the email, then:")
-        label.font = NSFont.systemFont(ofSize: 11)
-        label.textColor = NSColor.secondaryLabelColor
-        label.frame = NSRect(x: 12, y: 13, width: frame.width - 130, height: 18)
+        bar.wantsLayer = true
+        bar.layer?.backgroundColor = NSColor(calibratedRed: 1.0, green: 0.957, blue: 0.808, alpha: 1).cgColor
+        let label = NSTextField(wrappingLabelWithString:
+            "Signing in with email?  Don't click the link in the email.\nRight-click it, choose \"Copy Link\", then click Paste Link.")
+        label.font = NSFont.systemFont(ofSize: 12, weight: .semibold)
+        label.textColor = NSColor(calibratedRed: 0.24, green: 0.18, blue: 0.04, alpha: 1)
+        label.frame = NSRect(x: 14, y: 12, width: frame.width - 146, height: 52)
         label.autoresizingMask = [.width]
-        label.lineBreakMode = .byTruncatingTail
         let button = NSButton(title: "Paste Link", target: self, action: #selector(pasteLink))
         button.bezelStyle = .rounded
-        button.frame = NSRect(x: frame.width - 112, y: 8, width: 100, height: 28)
+        button.controlSize = .large
+        button.frame = NSRect(x: frame.width - 124, y: 22, width: 110, height: 32)
         button.autoresizingMask = [.minXMargin]
         bar.addSubview(label)
         bar.addSubview(button)
