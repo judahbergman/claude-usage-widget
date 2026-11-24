@@ -791,11 +791,12 @@ struct UsageRow: View {
     let now: Date
     let countdown: Bool
 
+    // Green while there's plenty left, orange from 50%, red from 80%.
     private var color: Color {
         let u = bucket?.utilization ?? 0
-        if u >= 90 { return Color(red: 0.95, green: 0.33, blue: 0.30) }
-        if u >= 75 { return Color(red: 0.98, green: 0.62, blue: 0.20) }
-        return Color(red: 0.33, green: 0.58, blue: 0.98)
+        if u >= 80 { return Color(red: 0.96, green: 0.33, blue: 0.30) }   // red
+        if u >= 50 { return Color(red: 0.98, green: 0.62, blue: 0.20) }   // orange
+        return Color(red: 0.30, green: 0.80, blue: 0.45)                  // green
     }
 
     var body: some View {
@@ -807,6 +808,7 @@ struct UsageRow: View {
                 Text(Formatting.percent(bucket))
                     .font(.system(size: 13, weight: .semibold))
                     .monospacedDigit()
+                    .foregroundColor(bucket == nil ? .secondary : color)
             }
             UsageBar(fraction: (bucket?.utilization ?? 0) / 100, color: color)
             Text(Formatting.reset(bucket?.resetsAt, countdown: countdown, now: now))

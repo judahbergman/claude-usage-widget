@@ -27,7 +27,7 @@ Requires macOS 12 or later. Works on Apple Silicon and Intel Macs.
 
 - **Click** (or right-click) the widget to open its menu: Refresh, Sign In, Keep On Top of Windows, Check for Updates, Quit.
 - **Drag** it wherever you like. It remembers its spot, even with more than one display.
-- Usage bars turn orange at 75% and red at 90%.
+- Usage bars are **green** while you have plenty left, turn **orange** at 50%, and **red** at 80%.
 
 ## Uninstall
 
