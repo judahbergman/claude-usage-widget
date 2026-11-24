@@ -3,9 +3,10 @@
 # Usage: ./build.sh [version] [build-number]
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
-VERSION="${1:-$(tr -d '[:space:]' < "$ROOT/VERSION")}"
+REPO="$(cd "$ROOT/.." && pwd)"
+VERSION="${1:-$(tr -d '[:space:]' < "$REPO/VERSION")}"
 BUILD="${2:-1}"
-OUT="$ROOT/dist"
+OUT="$REPO/dist/mac"
 APP="$OUT/Claude Usage.app"
 
 rm -rf "$OUT"
