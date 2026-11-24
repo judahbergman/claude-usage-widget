@@ -74,7 +74,8 @@ internal sealed class TrayApp : ApplicationContext
                 try
                 {
                     (int status, string body) = await _web.FetchAsync("/api/organizations");
-                    line = $"hidden browser fetch: HTTP {status}, {body.Length} bytes";
+                    string start = body.Length > 120 ? body[..120] : body;
+                    line = $"hidden browser fetch: HTTP {status}, {body.Length} bytes: {start.Replace('\n', ' ')}";
                 }
                 catch (FetchException e)
                 {
