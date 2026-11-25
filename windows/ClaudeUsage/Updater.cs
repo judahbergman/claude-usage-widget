@@ -7,7 +7,7 @@ namespace ClaudeUsage;
 /// <summary>New versions are published on GitHub; this checks for them and installs them.</summary>
 internal static class Updater
 {
-    private const string Repo = "JoolBaby/claude-usage-widget";
+    private const string Repo = "judahbergman/claude-usage-widget";
     private const string AssetName = "ClaudeUsage-Windows.exe";
 
     private static readonly HttpClient Http = CreateClient();

@@ -1,6 +1,6 @@
 # Installs (or reinstalls) Claude Usage for Windows from the latest GitHub release.
 #
-#   Install:  irm https://raw.githubusercontent.com/JoolBaby/claude-usage-widget/main/install.ps1 | iex
+#   Install:  irm https://raw.githubusercontent.com/judahbergman/claude-usage-widget/main/install.ps1 | iex
 #
 # After this, the app keeps itself up to date. To remove it, right-click its icon by the
 # clock and choose "Uninstall Claude Usage…".
@@ -9,7 +9,7 @@ $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'   # makes the download much faster
 try { [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12 } catch { }
 
-$repo = 'JoolBaby/claude-usage-widget'
+$repo = 'judahbergman/claude-usage-widget'
 $dir  = Join-Path $env:LOCALAPPDATA 'Programs\ClaudeUsage'
 $exe  = Join-Path $dir 'ClaudeUsage.exe'
 $tmp  = Join-Path $dir 'ClaudeUsage.download'

@@ -370,7 +370,7 @@ enum UpdateError: Error {
 }
 
 enum Updater {
-    static let repo = "JoolBaby/claude-usage-widget"
+    static let repo = "judahbergman/claude-usage-widget"
     static let launchLabel = "com.joolbaby.claudeusage"
 
     static var currentVersion: String {

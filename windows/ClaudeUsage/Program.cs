@@ -14,6 +14,13 @@ internal static class Program
     [STAThread]
     private static void Main(string[] args)
     {
+        // Opened from Downloads (or anywhere else): install, start the installed copy, quit.
+        if (!SelfTest && Installer.ShouldInstall())
+        {
+            Installer.Run();
+            return;
+        }
+
         // After an update, the new version waits for the old one to quit first.
         int waitIndex = Array.IndexOf(args, "--wait-for");
         if (waitIndex >= 0 && waitIndex + 1 < args.Length && int.TryParse(args[waitIndex + 1], out int oldPid))
