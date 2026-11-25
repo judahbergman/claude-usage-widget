@@ -26,7 +26,7 @@ Press **Command (⌘) + Space**, type **Terminal**, and press **Return**. A wind
 **2. Copy this line, paste it into Terminal, and press Return:**
 
 ```
-curl -fsSL https://raw.githubusercontent.com/JoolBaby/claude-usage-widget/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/judahbergman/claude-usage-widget/main/install.sh | bash
 ```
 
 You'll see a few lines appear as it downloads and installs. It ends with **"Done!"**
@@ -54,7 +54,7 @@ Click **Start**, type **PowerShell**, and click **Windows PowerShell**. A blue o
 **2. Copy this line, paste it into PowerShell (right-click to paste), and press Enter:**
 
 ```
-irm https://raw.githubusercontent.com/JoolBaby/claude-usage-widget/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/judahbergman/claude-usage-widget/main/install.ps1 | iex
 ```
 
 It downloads the app (about 70 MB) and ends with **"Done! Claude Usage is running."**
@@ -110,7 +110,7 @@ The window closes on its own when you're signed in, and your usage appears.
 
 - **Mac:** paste this into Terminal and press Return:
   ```
-  curl -fsSL https://raw.githubusercontent.com/JoolBaby/claude-usage-widget/main/install.sh | bash -s -- --uninstall
+  curl -fsSL https://raw.githubusercontent.com/judahbergman/claude-usage-widget/main/install.sh | bash -s -- --uninstall
   ```
 - **Windows:** right-click the number by the clock → **Uninstall Claude Usage…**
 

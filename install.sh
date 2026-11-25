@@ -1,13 +1,13 @@
 #!/bin/bash
 # Installs (or reinstalls) the Claude Usage desktop widget from the latest GitHub release.
 #
-#   Install:    curl -fsSL https://raw.githubusercontent.com/JoolBaby/claude-usage-widget/main/install.sh | bash
-#   Uninstall:  curl -fsSL https://raw.githubusercontent.com/JoolBaby/claude-usage-widget/main/install.sh | bash -s -- --uninstall
+#   Install:    curl -fsSL https://raw.githubusercontent.com/judahbergman/claude-usage-widget/main/install.sh | bash
+#   Uninstall:  curl -fsSL https://raw.githubusercontent.com/judahbergman/claude-usage-widget/main/install.sh | bash -s -- --uninstall
 #
 # After this, the widget keeps itself up to date.
 set -e
 
-REPO="JoolBaby/claude-usage-widget"
+REPO="judahbergman/claude-usage-widget"
 APP="/Applications/Claude Usage.app"
 OLD_APP="$HOME/Applications/Claude Usage.app"
 BUNDLE_ID="com.joolbaby.claudeusage"
