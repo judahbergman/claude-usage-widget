@@ -46,23 +46,19 @@ The installer pauses and shows you how to sign in. Read it, press **Return**, an
 
 ## Install on Windows
 
-Takes about a minute. Works on Windows 10 and 11.
+Takes about a minute. Works on Windows 10 and 11. No typing needed.
 
-**1. Open PowerShell.**
-Click **Start**, type **PowerShell**, and click **Windows PowerShell**. A blue or black window with a text prompt opens. That's normal.
+**1. Download it:** [**Download Claude Usage for Windows**](https://github.com/judahbergman/claude-usage-widget/releases/latest/download/ClaudeUsage-Windows.exe) (about 70 MB)
 
-**2. Copy this line, paste it into PowerShell (right-click to paste), and press Enter:**
+**2. Open the downloaded file.** Double-click **ClaudeUsage-Windows.exe** in your Downloads folder (or click it at the bottom/top of your browser).
 
-```
-irm https://raw.githubusercontent.com/judahbergman/claude-usage-widget/main/install.ps1 | iex
-```
+> A blue **"Windows protected your PC"** box will appear. This is normal for small apps that aren't from a big-name publisher. Click **More info**, then **Run anyway**.
 
-It downloads the app (about 70 MB) and ends with **"Done! Claude Usage is running."**
+**3. Click OK.** A box explains what happens next, including how to sign in. Read it and click **OK**. The app installs itself; you can delete the downloaded file afterwards.
 
-**3. Sign in.**
-The installer pauses and shows you how to sign in. Read it, press **Enter**, and a **Sign in to Claude** window opens. See [Signing in](#signing-in) below.
+**4. Sign in.** A **Sign in to Claude** window opens. See [Signing in](#signing-in) below.
 
-**4. Find it in the taskbar.**
+**5. Find it in the taskbar.**
 Your usage appears as a small **colored number** in the taskbar, by the clock. The number is your session usage in percent.
 
 > **Don't see it?** Windows sometimes hides new icons. Click the small **up-arrow (^)** next to the clock. You'll find the colored number there. **Drag it onto the taskbar** so it's always visible.
@@ -72,7 +68,7 @@ Your usage appears as a small **colored number** in the taskbar, by the clock. T
 - **Hover** over it for a quick summary.
 - **Right-click** it for options: Refresh, Sign In, Start with Windows, Check for Updates, Uninstall, Quit.
 
-> If a blue **"Windows protected your PC"** box ever appears, click **More info → Run anyway**. It appears because the app isn't from a big-name publisher; it's safe.
+> **Prefer PowerShell?** You can also install by pasting this into PowerShell: `irm https://raw.githubusercontent.com/judahbergman/claude-usage-widget/main/install.ps1 | iex`
 
 ---
 
